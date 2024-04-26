@@ -1,0 +1,282 @@
+env:
+  browser: true
+  es6: true
+  node: true
+  jest: true
+
+extends:
+  - google
+  - next/core-web-vitals
+  - plugin:tailwindcss/recommended
+  - plugin:yml/standard
+
+globals:
+  Atomics: readonly
+  SharedArrayBuffer: readonly
+
+parser: "@typescript-eslint/parser"
+
+parserOptions:
+  ecmaFeatures:
+    jsx: true
+  ecmaVersion: latest
+  sourceType: module
+  project: tsconfig.eslint.json
+
+plugins:
+  - "@stylistic"
+  - "@typescript-eslint"
+  - react
+  - unused-imports
+
+rules:
+  # Need to disable this for `unused-imports/no-unused-vars` to work properly
+  no-unused-vars:
+    - off
+
+  # Need to disable this for `unused-imports/no-unused-vars` to work properly
+  "@stylistic/no-unused-vars":
+    - off
+
+  unused-imports/no-unused-vars:
+    - error
+    - varsIgnorePattern: "^[_]+$"
+      argsIgnorePattern: "^[_]+$"
+      ignoreRestSiblings: true
+
+  unused-imports/no-unused-imports:
+    - error
+
+  indent:
+    - off
+
+  # Not using `@stylistic/indent` as it has different behavior than the one in `@typescript-eslint/indent`
+  "@typescript-eslint/indent":
+    - error
+    - 2
+    - ignoredNodes:
+        - TSTypeParameterInstantiation
+      MemberExpression: 1
+
+  linebreak-style:
+    - error
+    - unix
+
+  max-len:
+    - error
+    - code: 119
+
+  no-console:
+    - error
+    - allow:
+        - info
+        - warn
+        - error
+
+  # Need to disable this for `@typescript-eslint/no-restricted-imports` to work properly
+  no-restricted-imports:
+    - off
+
+  "@typescript-eslint/no-restricted-imports":
+    - error
+    - patterns:
+        - group:
+            - .*
+          message: Only absolute import, such as `@/const/auth` is allowed.
+        - group:
+            - next-auth/react
+          importNames:
+            - signIn
+            - signOut
+          message: Use `authClientSignIn()` / `authClientSignOut()` instead.
+        - group:
+            - "@/auth"
+          importNames:
+            - signIn
+            - signOut
+          message: Use `authServerSignIn()` / `authServerSignOut()` instead.
+
+  import/order:
+    - error
+    - groups:
+        - builtin
+        - external
+        - internal
+      pathGroups:
+        - pattern: react
+          group: external
+          position: before
+      pathGroupsExcludedImportTypes:
+        - react
+      newlines-between: always
+      alphabetize:
+        order: asc
+        caseInsensitive: true
+
+  import/newline-after-import:
+    - error
+    - count: 2
+
+  "@stylistic/object-curly-spacing":
+    - error
+    - never
+
+  "@stylistic/semi":
+    - error
+
+  "@stylistic/member-delimiter-style":
+    - error
+    - multiline:
+        delimiter: comma
+        requireLast: true
+
+  space-in-parens:
+    - error
+    - never
+
+  # Typescript will perform this check, no need for React to check it
+  react/prop-types:
+    - off
+
+  react/jsx-tag-spacing:
+    - error
+    - beforeSelfClosing: never
+
+  # Most of the dependencies are fine getting the initial value only
+  react-hooks/exhaustive-deps:
+    - off
+
+  require-jsdoc:
+    - off
+
+  tailwindcss/classnames-order:
+    - error
+
+  tailwindcss/no-custom-classname:
+    - error
+    - whitelist:
+        # For ads randomized class name
+        - ^f$
+        - ^w$
+        # To report false-positive
+        - ^main_anchored-ads$
+        - ^main_ads-content$
+
+  quote-props:
+    - error
+    - consistent-as-needed
+    - keywords: false
+      unnecessary: true
+
+  "@stylistic/comma-dangle":
+    - error
+    - arrays: always-multiline
+      objects: always-multiline
+      imports: always-multiline
+      exports: always-multiline
+      functions: always-multiline
+      tuples: always-multiline
+      enums: always-multiline
+      generics: ignore
+
+  "@stylistic/space-unary-ops":
+    - error
+    - words: true
+      nonwords: false
+
+  "@stylistic/space-infix-ops":
+    - error
+
+  no-trailing-spaces: error
+
+  padding-line-between-statements:
+    - error
+    - blankLine: always
+      prev: "*"
+      next: cjs-export
+    - blankLine: always
+      prev: "*"
+      next: export
+    - blankLine: always
+      prev: const
+      next: cjs-export
+    - blankLine: always
+      prev: "*"
+      next: export
+
+  implicit-arrow-linebreak:
+    - error
+    - beside
+
+  function-call-argument-newline:
+    - error
+    - consistent
+
+  operator-linebreak:
+    - error
+    - after
+
+overrides:
+  - files:
+      - "*.json"
+
+    parser: jsonc-eslint-parser
+
+    rules:
+      max-len:
+        - off
+
+      "@stylistic/comma-dangle":
+        - error
+        - never
+
+      "@stylistic/semi":
+        - off
+
+      quotes:
+        - error
+        - double
+
+      quote-props:
+        - error
+        - always
+
+      array-element-newline:
+        - error
+        - multiline: true
+          minItems: 1
+
+      object-curly-newline:
+        - error
+        - multiline: true
+          minProperties: 1
+
+  - files:
+      - "*.yml"
+
+    parser: yaml-eslint-parser
+
+  - files:
+      - "**/*.config.js"
+
+    parserOptions:
+      sourceType: script
+
+  - files:
+      - "packages/**"
+      - "**/*.config.js"
+
+    rules:
+      arrow-body-style:
+        - error
+        - as-needed
+        - requireReturnForObjectLiteral: true
+
+      # Config files have no concept of path mapping since it's prior to compile.
+      "@typescript-eslint/no-restricted-imports": off
+
+settings:
+  react:
+    version: detect
+  tailwindcss:
+    classRegex: "^class(.*)?$"
